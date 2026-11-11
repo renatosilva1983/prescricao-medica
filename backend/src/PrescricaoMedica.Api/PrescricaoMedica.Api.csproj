@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Borda HTTP e Composition Root: liga as implementações da Infrastructure às portas da Application. -->
+  <ItemGroup>
+    <ProjectReference Include="..\PrescricaoMedica.Application\PrescricaoMedica.Application.csproj" />
+    <ProjectReference Include="..\PrescricaoMedica.Infrastructure\PrescricaoMedica.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

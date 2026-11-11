@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Casos de uso e portas (interfaces). Conhece apenas o domínio. -->
+  <ItemGroup>
+    <ProjectReference Include="..\PrescricaoMedica.Domain\PrescricaoMedica.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
