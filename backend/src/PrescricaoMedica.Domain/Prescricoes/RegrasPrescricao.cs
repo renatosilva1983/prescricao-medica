@@ -4,8 +4,9 @@ namespace PrescricaoMedica.Domain.Prescricoes;
 
 /// <summary>
 /// Limites e regras da prescrição, com os mesmos códigos de docs/regras-de-negocio.md.
-/// R01.3 e R03.2 são garantidas pela forma do agregado: a receita não estruturada não recebe
-/// itens e a estruturada não recebe texto livre.
+/// R01.3 e R03.2: a forma do agregado já impede o conteúdo do tipo errado (a não estruturada não
+/// recebe itens e a estruturada não recebe texto livre); a Application usa as duas regras para
+/// recusar, com 422, uma requisição que envie esse conteúdo.
 /// </summary>
 public static class RegrasPrescricao
 {
@@ -26,8 +27,14 @@ public static class RegrasPrescricao
     public static readonly Regra TextoLivreTamanho = new(
         "R01.2", Ecf1001, $"O texto da receita tem no máximo {TextoLivreTamanhoMaximo} caracteres.");
 
+    public static readonly Regra SemItensNaNaoEstruturada = new(
+        "R01.3", Ecf1001, "A receita não estruturada não tem itens; escreva a prescrição no texto livre.");
+
     public static readonly Regra QuantidadeItens = new(
         "R03.1", Ecf1003, $"A receita estruturada tem de {ItensMinimo} a {ItensMaximo} medicamentos.");
+
+    public static readonly Regra SemTextoLivreNaEstruturada = new(
+        "R03.2", Ecf1003, "A receita estruturada não tem texto livre; use os itens e a observação de cada item.");
 
     public static readonly Regra OrigemMedicamento = new(
         "R03.5", Ecf1003,

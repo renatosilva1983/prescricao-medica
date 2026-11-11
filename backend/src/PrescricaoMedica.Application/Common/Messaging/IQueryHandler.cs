@@ -1,0 +1,10 @@
+using PrescricaoMedica.Application.Common.Results;
+
+namespace PrescricaoMedica.Application.Common.Messaging;
+
+/// <summary>Caso de uso de leitura.</summary>
+public interface IQueryHandler<in TQuery, TResponse>
+    where TQuery : IQuery<TResponse>
+{
+    Task<Result<TResponse>> Handle(TQuery query, CancellationToken cancellationToken);
+}

@@ -6,4 +6,9 @@
     <ProjectReference Include="..\PrescricaoMedica.Infrastructure\PrescricaoMedica.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
+  </ItemGroup>
+
 </Project>
