@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.5.0] - 2026-11-11
+### Adicionado
+- Dockerfile da API (build em duas etapas, usuário sem privilégios) e serviço `api` no `docker-compose.yml`.
+- Pipeline `backend.yml` no GitHub Actions: build com avisos como erro, testes, artefato publicado, imagem no GitHub Container Registry e deploy de verificação com docker-compose e health check.
+
 ## [0.4.0] - 2026-11-11
 ### Adicionado
 - Consultas OData em `/odata/Prescricoes`, `/odata/Pacientes` e `/odata/Medicamentos`, sobre DTOs de leitura: `$filter`, `$orderby`, `$select`, `$top`, `$skip` e `$count`, com página de no máximo 50 linhas.
