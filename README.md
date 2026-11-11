@@ -4,7 +4,7 @@ Solução de **prescrição médica eletrônica** com back-end em **.NET 9**, fr
 
 O foco é a prescrição: emissão, revisão, consulta e exclusão de receitas **não estruturadas** (texto livre) e **estruturadas** (itens com medicamento, dose, frequência, via e duração). Pacientes e medicamentos vêm pré-cadastrados no banco.
 
-> **Situação:** fase 0 — escopo, padrões e planejamento. As implementações seguem as etapas descritas em [docs/planejamento.md](docs/planejamento.md).
+> **Situação:** API REST da prescrição pronta. As próximas etapas (OData, front-end e entrega) estão em [docs/planejamento.md](docs/planejamento.md).
 
 ## Documentação
 
@@ -33,4 +33,18 @@ prescricao-medica/
 
 ## Como rodar
 
-Em construção. A partir da versão `0.1.0`, o banco sobe com `docker compose up -d mysql`; na `1.0.0`, `docker compose up -d` sobe banco, API e front.
+Pré-requisitos: Docker e o SDK do .NET 9 (ou mais novo).
+
+```powershell
+docker compose up -d mysql                                  # banco com as tabelas e os dados iniciais
+dotnet run --project backend/src/PrescricaoMedica.Api       # API em http://localhost:5180
+dotnet test backend/PrescricaoMedica.slnx                   # testes do back-end
+```
+
+| O quê | Onde |
+| --- | --- |
+| Documentação interativa (Scalar) | http://localhost:5180/scalar |
+| Saúde da API e do banco | http://localhost:5180/health |
+| Exemplos de requisição, inclusive de erros | [`PrescricaoMedica.Api.http`](backend/src/PrescricaoMedica.Api/PrescricaoMedica.Api.http) |
+
+Na versão `1.0.0`, `docker compose up -d` sobe banco, API e front-end.
