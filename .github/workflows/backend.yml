@@ -1,0 +1,129 @@
+# Pipeline da API: build, testes, artefato, imagem e deploy de verificação.
+# Roda no commit que disparou o evento (ver docs/fluxo-git.md).
+name: backend
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ["v*"]
+    paths:
+      - "backend/**"
+      - "database/**"
+      - "docker-compose.yml"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  IMAGEM: ghcr.io/${{ github.repository }}/api
+
+jobs:
+  build:
+    name: Build e testes
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore
+        run: dotnet restore PrescricaoMedica.slnx
+
+      - name: Build (avisos viram erro)
+        run: dotnet build PrescricaoMedica.slnx -c Release --no-restore
+
+      - name: Testes
+        run: dotnet test PrescricaoMedica.slnx -c Release --no-build --logger trx --results-directory TestResults
+
+      - name: Publish
+        run: dotnet publish src/PrescricaoMedica.Api/PrescricaoMedica.Api.csproj -c Release --no-build -o publish
+
+      - name: Artefato da API
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-${{ github.sha }}
+          path: backend/publish
+          retention-days: 7
+
+      - name: Resultado dos testes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testes-${{ github.sha }}
+          path: backend/TestResults
+          retention-days: 7
+
+  imagem:
+    name: Imagem Docker
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.IMAGEM }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    # Deploy de verificação: sobe banco e API com o docker-compose no runner e testa o /health
+    # e uma consulta real. O alvo definitivo (nuvem) entra trocando só este job.
+    name: Deploy de verificação
+    needs: imagem
+    runs-on: ubuntu-latest
+    environment: verificacao
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Subir banco e API
+        run: docker compose up -d --build --wait mysql api
+
+      - name: Health check
+        run: |
+          for tentativa in $(seq 1 30); do
+            curl -fsS http://localhost:5080/health && exit 0
+            sleep 2
+          done
+          docker compose logs api
+          exit 1
+
+      - name: Consulta de fumaça
+        run: curl -fsS "http://localhost:5080/odata/Medicamentos?\$top=3"
+
+      - name: Derrubar ambiente
+        if: always()
+        run: docker compose down -v
