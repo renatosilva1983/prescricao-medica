@@ -16,6 +16,10 @@
   <ItemGroup Label="Infrastructure">
     <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
   </ItemGroup>
+  <ItemGroup Label="Api">
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.18.7" />
+  </ItemGroup>
   <ItemGroup Label="Testes">
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
