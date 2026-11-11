@@ -3,6 +3,8 @@
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
+
+## [0.3.0] - 2026-11-11
 ### Adicionado
 - Persistência com EF Core e MySQL (Pomelo): mapeamento das tabelas existentes, repositórios, unidade de trabalho, conexão validada na partida e verificação do banco no `/health`.
 - Casos de uso de emitir, revisar, excluir e visualizar prescrição: CQRS sem mediator, Result Pattern, validação de entrada com FluentValidation e decorators de validação e log; testes dos casos de uso.
