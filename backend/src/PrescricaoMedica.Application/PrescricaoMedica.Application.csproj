@@ -5,4 +5,16 @@
     <ProjectReference Include="..\PrescricaoMedica.Domain\PrescricaoMedica.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Scrutor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Os validadores são internos; os testes unitários os acessam diretamente. -->
+    <InternalsVisibleTo Include="PrescricaoMedica.UnitTests" />
+  </ItemGroup>
+
 </Project>
