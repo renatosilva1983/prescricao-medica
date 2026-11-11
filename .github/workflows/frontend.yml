@@ -1,0 +1,89 @@
+# Pipeline do front-end: testes, build, artefato e imagem Docker (nginx).
+name: frontend
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ["v*"]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGEM: ghcr.io/${{ github.repository }}/web
+
+jobs:
+  build:
+    name: Testes e build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/prescricao-web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # O lockfile foi gerado com npm 11 (o npm 10 do Node 22 falha nas peer deps do vitest/jsdom).
+      - name: npm 11
+        run: npm install -g npm@11
+
+      - name: Dependências
+        run: npm ci
+
+      - name: Testes
+        run: npm test -- --watch=false
+
+      - name: Build de produção
+        run: npm run build
+
+      - name: Artefato do front-end
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-${{ github.sha }}
+          path: frontend/prescricao-web/dist/prescricao-web/browser
+          retention-days: 7
+
+  imagem:
+    name: Imagem Docker
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.IMAGEM }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: frontend/prescricao-web
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
