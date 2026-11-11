@@ -7,6 +7,22 @@ namespace PrescricaoMedica.Infrastructure.Persistence.Queries;
 /// <summary>Leitura sem rastreamento, projetada direto para os DTOs.</summary>
 internal sealed class PrescricaoQueries(PrescricaoDbContext dbContext) : IPrescricaoQueries
 {
+    public IQueryable<PrescricaoResumoDto> Resumos() =>
+        from prescricao in dbContext.Prescricoes.AsNoTracking()
+        join paciente in dbContext.Pacientes on prescricao.PacienteId equals paciente.Id
+        select new PrescricaoResumoDto
+        {
+            Id = prescricao.Id,
+            PacienteId = prescricao.PacienteId,
+            NomePaciente = paciente.NomeCompleto,
+            Tipo = prescricao.Tipo,
+            NomeProfissional = prescricao.NomeProfissional,
+            RegistroProfissional = prescricao.RegistroProfissional,
+            EmitidaEmUtc = prescricao.EmitidaEmUtc,
+            AtualizadaEmUtc = prescricao.AtualizadaEmUtc,
+            QuantidadeItens = prescricao.Itens.Count,
+        };
+
     public async Task<PrescricaoDetalheDto?> ObterDetalheAsync(int id, CancellationToken cancellationToken)
     {
         var cabecalho = await (
