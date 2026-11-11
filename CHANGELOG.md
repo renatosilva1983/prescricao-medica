@@ -3,6 +3,9 @@
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
+### Adicionado
+- Dockerfile da API (build em duas etapas, usuário sem privilégios) e serviço `api` no `docker-compose.yml`.
+- Pipeline `backend.yml` no GitHub Actions: build com avisos como erro, testes, artefato publicado, imagem no GitHub Container Registry e deploy de verificação com docker-compose e health check.
 
 ## [0.4.0] - 2026-11-11
 ### Adicionado
