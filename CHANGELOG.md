@@ -4,6 +4,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.2.0] - 2026-11-11
+### Adicionado
+- Domínio da prescrição: agregado `Prescricao` com `ItemPrescricao`, entidades `Paciente` e `Medicamento`, e as regras ECF.10.01 (receita não estruturada) e ECF.10.03 (receita estruturada) com testes unitários.
+
 ## [0.1.0] - 2026-11-11
 ### Adicionado
 - Escopo, regras de negócio, arquitetura, padrões de código e de banco de dados, fluxo de Git, planejamento e decisões de arquitetura.
