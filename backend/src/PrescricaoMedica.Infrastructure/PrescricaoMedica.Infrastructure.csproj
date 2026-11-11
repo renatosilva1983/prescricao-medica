@@ -5,4 +5,10 @@
     <ProjectReference Include="..\PrescricaoMedica.Application\PrescricaoMedica.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Options, configuração e health checks vêm do framework do ASP.NET Core, sem pacotes avulsos. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
+  </ItemGroup>
+
 </Project>
