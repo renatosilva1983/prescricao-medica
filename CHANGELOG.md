@@ -3,6 +3,8 @@
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
+
+## [0.4.0] - 2026-11-11
 ### Adicionado
 - Consultas OData em `/odata/Prescricoes`, `/odata/Pacientes` e `/odata/Medicamentos`, sobre DTOs de leitura: `$filter`, `$orderby`, `$select`, `$top`, `$skip` e `$count`, com página de no máximo 50 linhas.
 
