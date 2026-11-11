@@ -71,6 +71,20 @@ Content-Type: application/json
 ### Excluir a prescrição 3 → 204 (de novo → 404)
 DELETE {{baseUrl}}/api/prescricoes/3
 
+### --- Consultas OData ---
+
+### Prescrições mais recentes, 10 por página, com o total
+GET {{baseUrl}}/odata/Prescricoes?$orderby=emitidaEmUtc desc&$top=10&$count=true
+
+### Só as estruturadas de um paciente, com alguns campos
+GET {{baseUrl}}/odata/Prescricoes?$filter=tipo eq 'Estruturada' and contains(nomePaciente,'Helena')&$select=id,nomePaciente,quantidadeItens
+
+### Busca de medicamento por nome (lista de seleção, ECF.10.03 b)
+GET {{baseUrl}}/odata/Medicamentos?$filter=contains(nome,'dipi')&$orderby=nome
+
+### Busca de paciente por nome
+GET {{baseUrl}}/odata/Pacientes?$filter=contains(nomeCompleto,'ana')
+
 ### --- Erros ---
 
 ### Item com medicamento do cadastro E nome livre → 422, regra ECF.10.03 (R03.5)

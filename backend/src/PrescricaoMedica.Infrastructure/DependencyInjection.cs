@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IPacienteRepository, PacienteRepository>();
         services.AddScoped<IMedicamentoRepository, MedicamentoRepository>();
         services.AddScoped<IPrescricaoQueries, PrescricaoQueries>();
+        services.AddScoped<ICadastroQueries, CadastroQueries>();
 
         services.AddHealthChecks().AddCheck<MySqlHealthCheck>("mysql");
 

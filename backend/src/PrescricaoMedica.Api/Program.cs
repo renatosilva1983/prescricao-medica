@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.OData;
 using PrescricaoMedica.Api.ErrorHandling;
+using PrescricaoMedica.Api.OData;
 using PrescricaoMedica.Application;
 using PrescricaoMedica.Infrastructure;
 using Scalar.AspNetCore;
@@ -9,7 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Composition Root: cada camada registra o que é dela; a Api só monta as peças.
 builder.Services
     .AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+    .AddOData(options => options
+        .Select().Filter().OrderBy().Count().SetMaxTop(ODataModel.TopMaximo)
+        .AddRouteComponents(ODataModel.Prefixo, ODataModel.Criar()));
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddOpenApi();
