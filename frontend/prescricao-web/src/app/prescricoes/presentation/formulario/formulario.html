@@ -1,0 +1,223 @@
+<section class="pagina">
+  <header class="cabecalho-pagina">
+    <h1>{{ editando ? 'Editar prescrição' : 'Nova prescrição' }}</h1>
+    <a routerLink="/prescricoes" class="botao secundario">Voltar</a>
+  </header>
+
+  @if (!pronto()) {
+    @if (facade.erro(); as erro) {
+      <p class="alerta">{{ erro }}</p>
+    } @else {
+      <p>Carregando…</p>
+    }
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+      <fieldset class="cartao">
+        <legend>Dados gerais</legend>
+
+        <div class="grade">
+          <div class="campo largo">
+            <label for="paciente">Paciente *</label>
+            @if (editando) {
+              <input id="paciente" type="text" [value]="form.controls.nomePaciente.value" disabled />
+              <small>O paciente não pode ser alterado.</small>
+            } @else {
+              <app-campo-busca
+                idCampo="paciente"
+                placeholder="Busque pelo nome do paciente"
+                [buscar]="buscarPacientes"
+                [rotulo]="rotuloPaciente"
+                [invalido]="erro(form.controls.pacienteId)"
+                (selecionado)="selecionarPaciente($event)"
+                (limpo)="limparPaciente()"
+              />
+              @if (erro(form.controls.pacienteId)) {
+                <small class="erro">Selecione um paciente da lista.</small>
+              }
+            }
+          </div>
+
+          <div class="campo">
+            <label for="nomeProfissional">Profissional *</label>
+            <input id="nomeProfissional" type="text" formControlName="nomeProfissional"
+                   [class.invalido]="erro(form.controls.nomeProfissional)" />
+            @if (erro(form.controls.nomeProfissional)) {
+              <small class="erro">Informe o nome do profissional.</small>
+            }
+          </div>
+
+          <div class="campo">
+            <label for="registroProfissional">Registro *</label>
+            <input id="registroProfissional" type="text" formControlName="registroProfissional"
+                   placeholder="CRM-SP 123456" [class.invalido]="erro(form.controls.registroProfissional)" />
+            @if (erro(form.controls.registroProfissional)) {
+              <small class="erro">Informe o registro (ex.: CRM-SP 123456).</small>
+            }
+          </div>
+
+          <div class="campo">
+            <label for="tipo">Tipo *</label>
+            <select id="tipo" formControlName="tipo">
+              @for (t of tipos; track t.valor) {
+                <option [value]="t.valor">{{ t.rotulo }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      @if (form.controls.tipo.value === 'NaoEstruturada') {
+        <fieldset class="cartao">
+          <legend>Texto da prescrição</legend>
+          <div class="campo">
+            <label for="textoLivre">Texto livre *</label>
+            <textarea id="textoLivre" rows="10" formControlName="textoLivre" [attr.maxlength]="limiteTexto"
+                      [class.invalido]="erro(form.controls.textoLivre)"></textarea>
+            <small [class.erro]="erro(form.controls.textoLivre)">
+              {{ form.controls.textoLivre.value.length }}/{{ limiteTexto }} caracteres
+              @if (erro(form.controls.textoLivre)) { — obrigatório }
+            </small>
+          </div>
+        </fieldset>
+      } @else {
+        <div formArrayName="itens">
+          @for (item of itens.controls; track item; let i = $index) {
+            <fieldset class="cartao item" [formGroupName]="i">
+              <legend>Item {{ i + 1 }}</legend>
+              @if (itens.length > 1) {
+                <button type="button" class="botao perigo pequeno remover" (click)="removerItem(i)">Remover</button>
+              }
+
+              <div class="grade">
+                <div class="campo largo">
+                  <label class="checkbox">
+                    <input type="checkbox" formControlName="foraDoCadastro" />
+                    Fora do cadastro (ex.: manipulado)
+                  </label>
+                </div>
+
+                @if (item.controls.foraDoCadastro.value) {
+                  <div class="campo largo">
+                    <label [for]="'livre-' + i">Nome do medicamento *</label>
+                    <input [id]="'livre-' + i" type="text" formControlName="nomeMedicamentoLivre"
+                           [class.invalido]="erro(item.controls.nomeMedicamentoLivre)" />
+                    @if (erro(item.controls.nomeMedicamentoLivre)) {
+                      <small class="erro">Informe o nome do medicamento.</small>
+                    }
+                  </div>
+                } @else {
+                  <div class="campo largo">
+                    <label [for]="'med-' + i">Medicamento *</label>
+                    <app-campo-busca
+                      [idCampo]="'med-' + i"
+                      placeholder="Busque no cadastro pelo nome"
+                      [textoInicial]="item.controls.nomeMedicamento.value"
+                      [buscar]="buscarMedicamentos"
+                      [rotulo]="rotuloMedicamento"
+                      [invalido]="erro(item.controls.medicamentoId)"
+                      (selecionado)="selecionarMedicamento(item, $event)"
+                      (limpo)="limparMedicamento(item)"
+                    />
+                    @if (erro(item.controls.medicamentoId)) {
+                      <small class="erro">Selecione um medicamento do cadastro.</small>
+                    }
+                  </div>
+                }
+
+                <div class="campo">
+                  <label [for]="'forma-' + i">Forma farmacêutica *</label>
+                  <input [id]="'forma-' + i" type="text" formControlName="formaFarmaceutica" list="formas"
+                         [class.invalido]="erro(item.controls.formaFarmaceutica)" />
+                </div>
+
+                <div class="campo">
+                  <label [for]="'dose-' + i">Dose *</label>
+                  <div class="linha">
+                    <input [id]="'dose-' + i" type="number" min="0" step="any" formControlName="doseQuantidade"
+                           [class.invalido]="erro(item.controls.doseQuantidade)" />
+                    <input type="text" formControlName="doseUnidade" list="unidades" placeholder="unidade"
+                           aria-label="Unidade da dose" [class.invalido]="erro(item.controls.doseUnidade)" />
+                  </div>
+                </div>
+
+                <div class="campo">
+                  <label [for]="'freq-' + i">Frequência *</label>
+                  <input [id]="'freq-' + i" type="text" formControlName="frequencia" placeholder="ex.: 8 em 8 horas"
+                         [class.invalido]="erro(item.controls.frequencia)" />
+                </div>
+
+                <div class="campo">
+                  <label [for]="'via-' + i">Via de administração *</label>
+                  <input [id]="'via-' + i" type="text" formControlName="viaAdministracao" list="vias"
+                         [class.invalido]="erro(item.controls.viaAdministracao)" />
+                </div>
+
+                <div class="campo">
+                  <label [for]="'inicio-' + i">Início *</label>
+                  <input [id]="'inicio-' + i" type="date" formControlName="dataInicio"
+                         [class.invalido]="erro(item.controls.dataInicio)" />
+                </div>
+
+                <div class="campo">
+                  <label class="checkbox espaco-topo">
+                    <input type="checkbox" formControlName="usoContinuo" />
+                    Uso contínuo
+                  </label>
+                </div>
+
+                @if (!item.controls.usoContinuo.value) {
+                  <div class="campo">
+                    <label [for]="'dur-' + i">Duração (dias) *</label>
+                    <input [id]="'dur-' + i" type="number" [min]="minDuracao" [max]="maxDuracao" step="1"
+                           formControlName="duracaoDias" [class.invalido]="erro(item.controls.duracaoDias)" />
+                    @if (erro(item.controls.duracaoDias)) {
+                      <small class="erro">Entre {{ minDuracao }} e {{ maxDuracao }} dias.</small>
+                    }
+                  </div>
+                }
+
+                <div class="campo">
+                  <label [for]="'prazo-' + i">Prazo de utilização</label>
+                  <input [id]="'prazo-' + i" type="date" formControlName="dataLimiteUso"
+                         [class.invalido]="item.hasError('prazoAntesDoInicio')" />
+                  @if (item.hasError('prazoAntesDoInicio')) {
+                    <small class="erro">Não pode ser anterior ao início.</small>
+                  }
+                </div>
+
+                <div class="campo largo">
+                  <label [for]="'obs-' + i">Observação</label>
+                  <textarea [id]="'obs-' + i" rows="2" formControlName="observacao" [attr.maxlength]="limiteObservacao"
+                            [class.invalido]="erro(item.controls.observacao)"></textarea>
+                  <small>{{ item.controls.observacao.value.length }}/{{ limiteObservacao }}</small>
+                </div>
+              </div>
+            </fieldset>
+          }
+        </div>
+
+        <p>
+          <button type="button" class="botao secundario" (click)="adicionarItem()" [disabled]="itens.length >= maxItens">
+            + Adicionar item
+          </button>
+          <small> {{ itens.length }}/{{ maxItens }} itens</small>
+        </p>
+      }
+
+      @if (facade.erro(); as erro) {
+        <p class="alerta">{{ erro }}</p>
+      }
+
+      <div class="acoes">
+        <button type="submit" class="botao" [disabled]="facade.salvando()">
+          {{ facade.salvando() ? 'Salvando…' : 'Salvar' }}
+        </button>
+        <a [routerLink]="editando ? ['/prescricoes', id()] : ['/prescricoes']" class="botao secundario">Cancelar</a>
+      </div>
+
+      <datalist id="formas">@for (f of formas; track f) {<option [value]="f"></option>}</datalist>
+      <datalist id="unidades">@for (u of unidades; track u) {<option [value]="u"></option>}</datalist>
+      <datalist id="vias">@for (v of vias; track v) {<option [value]="v"></option>}</datalist>
+    </form>
+  }
+</section>

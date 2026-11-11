@@ -1,0 +1,57 @@
+<section class="pagina">
+  <header class="cabecalho-pagina">
+    <h1>Prescrição</h1>
+    <a routerLink="/prescricoes" class="botao secundario">Voltar</a>
+  </header>
+
+  @if (prescricao(); as p) {
+    <div class="cartao">
+      <dl class="dados">
+        <div><dt>Paciente</dt><dd>{{ p.nomePaciente }}</dd></div>
+        <div><dt>Tipo</dt><dd><span class="etiqueta" [class.estruturada]="p.tipo === 'Estruturada'">{{ rotuloTipo(p.tipo) }}</span></dd></div>
+        <div><dt>Profissional</dt><dd>{{ p.nomeProfissional }}</dd></div>
+        <div><dt>Registro</dt><dd>{{ p.registroProfissional }}</dd></div>
+        <div><dt>Emitida em</dt><dd>{{ p.emitidaEmUtc | date: 'dd/MM/yyyy HH:mm' }}</dd></div>
+        <div><dt>Atualizada em</dt><dd>{{ p.atualizadaEmUtc ? (p.atualizadaEmUtc | date: 'dd/MM/yyyy HH:mm') : '—' }}</dd></div>
+      </dl>
+    </div>
+
+    @if (p.tipo === 'NaoEstruturada') {
+      <div class="cartao">
+        <h2>Texto</h2>
+        <p class="texto-livre">{{ p.textoLivre }}</p>
+      </div>
+    } @else {
+      <h2>Itens ({{ p.itens.length }})</h2>
+      @for (item of p.itens; track item.id; let i = $index) {
+        <article class="cartao item">
+          <h3>
+            {{ i + 1 }}. {{ item.nomeMedicamento }}
+            @if (!item.medicamentoCadastrado) { <span class="etiqueta">fora do cadastro</span> }
+          </h3>
+          <dl class="dados">
+            <div><dt>Forma</dt><dd>{{ item.formaFarmaceutica }}</dd></div>
+            <div><dt>Dose</dt><dd>{{ item.doseQuantidade | number: '1.0-4' }} {{ item.doseUnidade }}</dd></div>
+            <div><dt>Frequência</dt><dd>{{ item.frequencia }}</dd></div>
+            <div><dt>Via</dt><dd>{{ item.viaAdministracao }}</dd></div>
+            <div><dt>Início</dt><dd>{{ item.dataInicio | date: 'dd/MM/yyyy' : 'UTC' }}</dd></div>
+            <div><dt>Duração</dt><dd>{{ item.usoContinuo ? 'Uso contínuo' : item.duracaoDias + ' dia(s)' }}</dd></div>
+            <div><dt>Prazo de utilização</dt><dd>{{ item.dataLimiteUso ? (item.dataLimiteUso | date: 'dd/MM/yyyy' : 'UTC') : '—' }}</dd></div>
+            @if (item.observacao) {
+              <div class="largo"><dt>Observação</dt><dd>{{ item.observacao }}</dd></div>
+            }
+          </dl>
+        </article>
+      }
+    }
+
+    <div class="acoes">
+      <a [routerLink]="['/prescricoes', p.id, 'editar']" class="botao">Editar</a>
+      <button type="button" class="botao perigo" (click)="excluir(p)">Excluir</button>
+    </div>
+  } @else if (facade.carregando()) {
+    <p>Carregando…</p>
+  } @else if (facade.erro(); as erro) {
+    <p class="alerta">{{ erro }}</p>
+  }
+</section>
