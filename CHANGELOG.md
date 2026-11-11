@@ -4,6 +4,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.4.0] - 2026-11-11
+### Adicionado
+- Consultas OData em `/odata/Prescricoes`, `/odata/Pacientes` e `/odata/Medicamentos`, sobre DTOs de leitura: `$filter`, `$orderby`, `$select`, `$top`, `$skip` e `$count`, com página de no máximo 50 linhas.
+
 ## [0.3.0] - 2026-11-11
 ### Adicionado
 - Persistência com EF Core e MySQL (Pomelo): mapeamento das tabelas existentes, repositórios, unidade de trabalho, conexão validada na partida e verificação do banco no `/health`.
