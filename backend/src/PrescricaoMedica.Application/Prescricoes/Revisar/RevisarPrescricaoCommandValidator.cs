@@ -1,0 +1,3 @@
+namespace PrescricaoMedica.Application.Prescricoes.Revisar;
+
+internal sealed class RevisarPrescricaoCommandValidator : ConteudoPrescricaoValidator<RevisarPrescricaoCommand>;
