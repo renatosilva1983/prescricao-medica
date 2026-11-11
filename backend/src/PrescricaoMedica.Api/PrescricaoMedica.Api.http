@@ -1,0 +1,186 @@
+# Exemplos da API. Suba o banco (docker compose up -d mysql) e a API (dotnet run --project backend/src/PrescricaoMedica.Api).
+# Documentação interativa: http://localhost:5180/scalar
+@baseUrl = http://localhost:5180
+
+### Saúde (inclui a conexão com o MySQL)
+GET {{baseUrl}}/health
+
+### Visualizar a prescrição 2 (estruturada, com um manipulado)
+GET {{baseUrl}}/api/prescricoes/2
+
+### Emitir receita não estruturada (ECF.10.01) → 201
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 3,
+  "tipo": "NaoEstruturada",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "textoLivre": "Repouso relativo por 2 dias. Retornar se houver piora."
+}
+
+### Emitir receita estruturada (ECF.10.03): um medicamento do cadastro e um manipulado → 201
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 4,
+  "tipo": "Estruturada",
+  "nomeProfissional": "Dr. Ricardo Tavares",
+  "registroProfissional": "CRM-SP 654321",
+  "itens": [
+    {
+      "medicamentoId": 4,
+      "formaFarmaceutica": "Comprimido revestido",
+      "doseQuantidade": 600,
+      "doseUnidade": "mg",
+      "frequencia": "De 8 em 8 horas",
+      "viaAdministracao": "Oral",
+      "dataInicio": "2026-11-11",
+      "duracaoDias": 5,
+      "usoContinuo": false,
+      "observacao": "Tomar após as refeições."
+    },
+    {
+      "nomeMedicamentoLivre": "Pomada de calêndula 5% (manipulado)",
+      "formaFarmaceutica": "Pomada",
+      "doseQuantidade": 1,
+      "doseUnidade": "aplicação",
+      "frequencia": "3 vezes ao dia",
+      "viaAdministracao": "Tópica",
+      "dataInicio": "2026-11-11",
+      "duracaoDias": 10,
+      "usoContinuo": false,
+      "dataLimiteUso": "2026-11-30"
+    }
+  ]
+}
+
+### Revisar a prescrição 1 → 204
+PUT {{baseUrl}}/api/prescricoes/1
+Content-Type: application/json
+
+{
+  "tipo": "NaoEstruturada",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "textoLivre": "Repouso relativo por 5 dias. Hidratação oral abundante."
+}
+
+### Excluir a prescrição 3 → 204 (de novo → 404)
+DELETE {{baseUrl}}/api/prescricoes/3
+
+### --- Erros ---
+
+### Item com medicamento do cadastro E nome livre → 422, regra ECF.10.03 (R03.5)
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 1,
+  "tipo": "Estruturada",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "itens": [
+    {
+      "medicamentoId": 5,
+      "nomeMedicamentoLivre": "Amoxicilina manipulada",
+      "formaFarmaceutica": "Cápsula",
+      "doseQuantidade": 500,
+      "doseUnidade": "mg",
+      "frequencia": "De 8 em 8 horas",
+      "viaAdministracao": "Oral",
+      "dataInicio": "2026-11-11",
+      "duracaoDias": 7,
+      "usoContinuo": false
+    }
+  ]
+}
+
+### Uso contínuo com duração → 422, regra ECF.10.03 (R03.9)
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 1,
+  "tipo": "Estruturada",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "itens": [
+    {
+      "medicamentoId": 7,
+      "formaFarmaceutica": "Comprimido revestido",
+      "doseQuantidade": 50,
+      "doseUnidade": "mg",
+      "frequencia": "1 vez ao dia",
+      "viaAdministracao": "Oral",
+      "dataInicio": "2026-11-11",
+      "duracaoDias": 30,
+      "usoContinuo": true
+    }
+  ]
+}
+
+### Medicamento que não existe no cadastro → 422, regra ECF.10.03 (R03.6)
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 1,
+  "tipo": "Estruturada",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "itens": [
+    {
+      "medicamentoId": 999,
+      "formaFarmaceutica": "Comprimido",
+      "doseQuantidade": 1,
+      "doseUnidade": "comprimido",
+      "frequencia": "1 vez ao dia",
+      "viaAdministracao": "Oral",
+      "dataInicio": "2026-11-11",
+      "duracaoDias": 3,
+      "usoContinuo": false
+    }
+  ]
+}
+
+### Receita não estruturada sem texto → 422, regra ECF.10.01 (R01.1)
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 1,
+  "tipo": "NaoEstruturada",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "textoLivre": "   "
+}
+
+### Paciente inexistente → 404
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 999,
+  "tipo": "NaoEstruturada",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "textoLivre": "Repouso."
+}
+
+### Tipo desconhecido → 400
+POST {{baseUrl}}/api/prescricoes
+Content-Type: application/json
+
+{
+  "pacienteId": 1,
+  "tipo": "Outro",
+  "nomeProfissional": "Dra. Fernanda Moreira",
+  "registroProfissional": "CRM-SP 123456",
+  "textoLivre": "Repouso."
+}
+
+### Prescrição inexistente → 404
+GET {{baseUrl}}/api/prescricoes/999
