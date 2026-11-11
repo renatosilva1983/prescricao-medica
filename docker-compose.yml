@@ -1,0 +1,28 @@
+# Ambiente local. Nesta versão, só o banco; API e front entram na etapa f6.
+#   docker compose up -d mysql       sobe o MySQL e roda os scripts de database/ (na primeira vez)
+#   docker compose down -v           apaga o volume: na próxima subida os scripts rodam de novo
+# As senhas padrão valem só para desenvolvimento local; troque pelo arquivo .env.
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: prescricao-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root-dev}
+      MYSQL_DATABASE: prescricao
+      MYSQL_USER: prescricao_app
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-prescricao-dev}
+      TZ: UTC
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d:ro
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql-data:
