@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PrescricaoMedica.Application.Abstractions;
 using PrescricaoMedica.Infrastructure.Persistence;
+using PrescricaoMedica.Infrastructure.Persistence.Queries;
 using PrescricaoMedica.Infrastructure.Persistence.Repositories;
 
 namespace PrescricaoMedica.Infrastructure;
@@ -35,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IPrescricaoRepository, PrescricaoRepository>();
         services.AddScoped<IPacienteRepository, PacienteRepository>();
         services.AddScoped<IMedicamentoRepository, MedicamentoRepository>();
+        services.AddScoped<IPrescricaoQueries, PrescricaoQueries>();
 
         services.AddHealthChecks().AddCheck<MySqlHealthCheck>("mysql");
 
