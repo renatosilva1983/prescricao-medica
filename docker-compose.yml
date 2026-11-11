@@ -1,6 +1,6 @@
 # Ambiente local e de verificação.
 #   docker compose up -d mysql       sobe só o MySQL e roda os scripts de database/ (na primeira vez)
-#   docker compose up -d --build     sobe o MySQL e a API (http://localhost:5080)
+#   docker compose up -d --build     sobe MySQL, API (http://localhost:5080) e front-end (http://localhost:5081)
 #   docker compose down -v           apaga o volume: na próxima subida os scripts rodam de novo
 # As senhas padrão valem só para desenvolvimento local; troque pelo arquivo .env.
 
@@ -37,6 +37,14 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+
+  web:
+    build: ./frontend/prescricao-web
+    container_name: prescricao-web
+    ports:
+      - "${WEB_PORT:-5081}:80"
+    depends_on:
+      - api
 
 volumes:
   mysql-data:

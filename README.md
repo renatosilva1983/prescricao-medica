@@ -4,7 +4,7 @@ Solução de **prescrição médica eletrônica** com back-end em **.NET 9**, fr
 
 O foco é a prescrição: emissão, revisão, consulta e exclusão de receitas **não estruturadas** (texto livre) e **estruturadas** (itens com medicamento, dose, frequência, via e duração). Pacientes e medicamentos vêm pré-cadastrados no banco.
 
-> **Situação:** back-end completo (API REST, OData, regras SBIS, testes, Docker e pipeline). O front-end Angular é a próxima etapa (ver [Pendências](#pendências)).
+> **Situação:** back-end (API REST, OData, regras SBIS, testes, Docker e pipeline) e front-end Angular 21 com Docker e pipeline próprios.
 
 ## Documentação
 
@@ -47,10 +47,20 @@ dotnet test backend/PrescricaoMedica.slnx                   # testes do back-end
 | Saúde da API e do banco | http://localhost:5180/health |
 | Exemplos de requisição, inclusive de erros | [`PrescricaoMedica.Api.http`](backend/src/PrescricaoMedica.Api/PrescricaoMedica.Api.http) |
 
-### Com Docker (banco e API)
+### Front-end
 
 ```powershell
-docker compose up -d --build                                # API em http://localhost:5080
+cd frontend/prescricao-web
+npm ci
+npm start                                                   # http://localhost:4200, com proxy para a API na 5180
+```
+
+No Visual Studio: abra `frontend/prescricao-web.slnx` e use Iniciar.
+
+### Com Docker (banco, API e front-end)
+
+```powershell
+docker compose up -d --build                                # API em :5080, front-end em :5081
 ```
 
 A porta do host pode ser trocada pela variável `API_PORT` (no Windows, a 8080 costuma estar reservada).
@@ -68,5 +78,5 @@ O pipeline [`backend.yml`](.github/workflows/backend.yml) roda a cada push em `d
 
 | Item | Situação |
 | --- | --- |
-| Front-end Angular 21 (lista, criação, edição, visualização), com Dockerfile e pipeline próprios | Planejado na etapa f5 de [docs/planejamento.md](docs/planejamento.md); não entrou no prazo desta entrega |
+| Testes de ponta a ponta do front contra a API | Próxima etapa |
 | Alvo de deploy definitivo | A definir; o pipeline já entrega a imagem pronta para publicar |

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.7204101">
+  <!-- Projeto JavaScript do Visual Studio: abre o Angular numa solution e usa o botão Iniciar
+       (roda "npm start", com o proxy para a API em http://localhost:5180). -->
+  <PropertyGroup>
+    <StartupCommand>npm start</StartupCommand>
+    <!-- No Build do VS só roda o npm install; o build de produção é "npm run build". -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\prescricao-web\browser\</BuildOutputFolder>
+  </PropertyGroup>
+</Project>
