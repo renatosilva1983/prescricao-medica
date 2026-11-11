@@ -1,0 +1,15 @@
+<Project>
+  <!-- Configurações comuns a todos os projetos do back-end. -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Qualidade no build: avisos viram erro e as regras do .editorconfig são aplicadas. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- CS1591: documentação XML obrigatória só onde agrega, não em todo membro público. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PrescricaoMedica.Domain/PrescricaoMedica.Domain.csproj" />
+    <Project Path="src/PrescricaoMedica.Application/PrescricaoMedica.Application.csproj" />
+    <Project Path="src/PrescricaoMedica.Infrastructure/PrescricaoMedica.Infrastructure.csproj" />
+    <Project Path="src/PrescricaoMedica.Api/PrescricaoMedica.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PrescricaoMedica.UnitTests/PrescricaoMedica.UnitTests.csproj" />
+  </Folder>
+</Solution>
