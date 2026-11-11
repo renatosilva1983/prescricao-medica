@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Adaptadores de saída: persistência (EF Core + MySQL) implementando as portas da Application. -->
+  <ItemGroup>
+    <ProjectReference Include="..\PrescricaoMedica.Application\PrescricaoMedica.Application.csproj" />
+  </ItemGroup>
+
+</Project>
