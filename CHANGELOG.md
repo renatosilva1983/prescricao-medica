@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [1.0.0] - 2026-11-11
+### Adicionado
+- Front-end Angular 21 (`frontend/prescricao-web`): listagem com filtro, ordenação e paginação por OData; formulário de criação e edição dos dois tipos de receita, com busca de medicamento e opção fora do cadastro; visualização; testes Vitest; solution do Visual Studio (`frontend/prescricao-web.slnx`).
+- Dockerfile do front-end (nginx com proxy para a API), serviço `web` no `docker-compose.yml` e pipeline `frontend.yml` com testes, build, artefato e imagem.
+
 ## [0.5.0] - 2026-11-11
 ### Adicionado
 - Dockerfile da API (build em duas etapas, usuário sem privilégios) e serviço `api` no `docker-compose.yml`.

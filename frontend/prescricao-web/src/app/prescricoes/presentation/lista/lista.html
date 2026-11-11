@@ -1,0 +1,83 @@
+<section class="pagina">
+  <header class="cabecalho-pagina">
+    <h1>Prescrições</h1>
+    <a routerLink="/prescricoes/nova" class="botao">+ Nova prescrição</a>
+  </header>
+
+  <div class="filtros cartao">
+    <div class="campo">
+      <label for="filtro-nome">Paciente</label>
+      <input id="filtro-nome" type="search" placeholder="Nome do paciente"
+             [value]="facade.filtro().nomePaciente" (input)="filtrarNome($any($event.target).value)" />
+    </div>
+    <div class="campo">
+      <label for="filtro-tipo">Tipo</label>
+      <select id="filtro-tipo" [value]="facade.filtro().tipo" (change)="filtrarTipo($any($event.target).value)">
+        <option value="">Todos</option>
+        @for (t of tipos; track t.valor) {
+          <option [value]="t.valor">{{ t.rotulo }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (facade.erro(); as erro) {
+    <p class="alerta">{{ erro }}</p>
+  }
+
+  <div class="tabela-container">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>
+            <button type="button" class="ordenar" (click)="alternarOrdem()"
+                    [attr.aria-sort]="facade.filtro().ordem === 'desc' ? 'descending' : 'ascending'">
+              Emitida em {{ facade.filtro().ordem === 'desc' ? '▼' : '▲' }}
+            </button>
+          </th>
+          <th>Paciente</th>
+          <th>Tipo</th>
+          <th>Profissional</th>
+          <th class="num">Itens</th>
+          <th class="acoes-coluna">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of facade.lista(); track p.id) {
+          <tr>
+            <td>{{ p.emitidaEmUtc | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ p.nomePaciente }}</td>
+            <td><span class="etiqueta" [class.estruturada]="p.tipo === 'Estruturada'">{{ rotuloTipo(p.tipo) }}</span></td>
+            <td>{{ p.nomeProfissional }} <small>{{ p.registroProfissional }}</small></td>
+            <td class="num">{{ p.tipo === 'Estruturada' ? p.quantidadeItens : '—' }}</td>
+            <td class="acoes-coluna">
+              <a [routerLink]="['/prescricoes', p.id]" class="botao pequeno secundario">Ver</a>
+              <a [routerLink]="['/prescricoes', p.id, 'editar']" class="botao pequeno secundario">Editar</a>
+              <button type="button" class="botao pequeno perigo" (click)="excluir(p)">Excluir</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="vazio">{{ facade.carregando() ? 'Carregando…' : 'Nenhuma prescrição encontrada.' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="paginacao" aria-label="Paginação">
+    <button type="button" class="botao pequeno secundario" (click)="irPara(facade.filtro().pagina - 1)"
+            [disabled]="facade.filtro().pagina <= 1 || facade.carregando()">‹ Anterior</button>
+    <span>Página {{ facade.filtro().pagina }} de {{ facade.totalPaginas() }} · {{ facade.total() }} registro(s)</span>
+    <button type="button" class="botao pequeno secundario" (click)="irPara(facade.filtro().pagina + 1)"
+            [disabled]="facade.filtro().pagina >= facade.totalPaginas() || facade.carregando()">Próxima ›</button>
+    <label>
+      Por página
+      <select [value]="facade.filtro().tamanhoPagina" (change)="mudarTamanho($any($event.target).value)">
+        @for (t of tamanhos; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </label>
+  </nav>
+</section>
